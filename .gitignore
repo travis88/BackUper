@@ -1,0 +1,6 @@
+*~
+.vs/
+*/bin/
+*/obj/
+BackUp.Core/Template/dbModel.tt
+*/App.config
