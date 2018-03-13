@@ -126,6 +126,8 @@ namespace BackUp.Core
         private static void CopyBackups(ConfigParams _params)
         {
             messageBody += "<p>Список скопированных backup-ов:</p><p>";
+            string dateDir = DateTime.Now.ToString("yyyyMMdd");
+
             foreach(string fold in _params.Folders)
             {
                 try
@@ -133,13 +135,15 @@ namespace BackUp.Core
                     DirectoryInfo di = new DirectoryInfo(_params.PathFrom + fold);
                     FileInfo file = di.GetFiles("*.bak").OrderByDescending(p => p.CreationTime).FirstOrDefault();
 
-                    bool isExist = Directory.Exists(_params.PathTo + fold);
+                    string pathTo = _params.PathTo + dateDir + @"\" + fold;
+
+                    bool isExist = Directory.Exists(pathTo);
                     if (!isExist)
                     {
-                        Directory.CreateDirectory(_params.PathTo + fold);
+                        Directory.CreateDirectory(pathTo);
                     }
 
-                    file.CopyTo(Path.Combine(_params.PathTo + fold, file.Name));
+                    file.CopyTo(Path.Combine(pathTo, file.Name));
 
                     messageBody += fold + "; ";
                     ServiceLogger.Info("{work}", String.Format("копирование backup-а {0} проведено", fold));
