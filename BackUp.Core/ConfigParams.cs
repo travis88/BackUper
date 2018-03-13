@@ -37,6 +37,21 @@ namespace BackUp.Core
         public string PathTo { get; set; }
 
         /// <summary>
+        /// Фтп сервер
+        /// </summary>
+        public string FtpServer { get; set; }
+
+        /// <summary>
+        /// Логин для входа по фтп
+        /// </summary>
+        public string FtpUserName { get; set; }
+
+        /// <summary>
+        /// Пароль для входа по фтп
+        /// </summary>
+        public string FtpUserPassword { get; set; }
+
+        /// <summary>
         /// Список директорий
         /// </summary>
         public string StrFolders { get; set; }
@@ -91,6 +106,9 @@ namespace BackUp.Core
             Months = System.Configuration.ConfigurationManager.AppSettings["Backup.Months"].Split(';').Where(w => !String.IsNullOrEmpty(w)).Select(s => Int32.Parse(s)).ToArray();
             PathFrom = System.Configuration.ConfigurationManager.AppSettings["Backup.PathFrom"];
             PathTo = System.Configuration.ConfigurationManager.AppSettings["Backup.PathTo"];
+            FtpServer = System.Configuration.ConfigurationManager.AppSettings["Backup.FtpServer"];
+            FtpUserName = System.Configuration.ConfigurationManager.AppSettings["Backup.Username"];
+            FtpUserPassword = System.Configuration.ConfigurationManager.AppSettings["Backup.UserPassword"];
             StrFolders = System.Configuration.ConfigurationManager.AppSettings["Backup.Folders"].Replace("\n", "").Replace("\r", "").Replace(" ", "");
             Folders = StrFolders.Split(';').Where(w => !String.IsNullOrEmpty(w)).Select(s => s).ToArray();
             EmailFromAddress = System.Configuration.ConfigurationManager.AppSettings["Email.From.Address"];
