@@ -135,7 +135,7 @@ namespace BackUp.Core
                     DirectoryInfo di = new DirectoryInfo(_params.PathFrom + fold);
                     FileInfo file = di.GetFiles("*.bak").OrderByDescending(p => p.CreationTime).FirstOrDefault();
 
-                    string pathTo = _params.PathTo + dateDir + @"\" + fold;
+                    string pathTo = _params.PathTo + fold + @"\" + dateDir;
 
                     bool isExist = Directory.Exists(pathTo);
                     if (!isExist)

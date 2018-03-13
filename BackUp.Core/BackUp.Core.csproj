@@ -72,6 +72,7 @@
     <None Include="LinqToDB.Templates\LinqToDB.SqlCe.ttinclude" />
     <None Include="LinqToDB.Templates\LinqToDB.SQLite.ttinclude" />
     <None Include="LinqToDB.Templates\LinqToDB.SqlServer.SqlTypes.Tools.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.SqlServer.SqlTypes.ttinclude" />
     <None Include="LinqToDB.Templates\LinqToDB.SqlServer.Tools.ttinclude" />
     <None Include="LinqToDB.Templates\LinqToDB.SqlServer.ttinclude" />
     <None Include="LinqToDB.Templates\LinqToDB.Sybase.ttinclude" />
