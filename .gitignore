@@ -2,6 +2,5 @@
 .vs/
 */bin/
 */obj/
-BackUp.Core/Template/dbModel.tt
-BackUp.Core/Template/dbModel.generated.cs
+BackUp.Core/Template/
 */App.config
