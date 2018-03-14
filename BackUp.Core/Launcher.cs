@@ -24,6 +24,9 @@ namespace BackUp.Core
         /// </summary>
         private static string messageBody;
 
+        /// <summary>
+        /// Параметры 
+        /// </summary>
         private static ConfigParams Params { get; set; }
 
         /// <summary>
