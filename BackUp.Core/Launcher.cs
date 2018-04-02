@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BackUp.Core
 {
@@ -17,7 +14,7 @@ namespace BackUp.Core
         /// <summary>
         /// строка подключения
         /// </summary>
-        private static string connection = "defaultConnection";
+        private static readonly string connection = "defaultConnection";
 
         /// <summary>
         /// Текст письма
@@ -106,15 +103,18 @@ namespace BackUp.Core
                         var from = new MailAddress(Params.EmailFromAddress, Params.EmailFromName);
                         var to = new MailAddress(emailTo);
 
-                        var message = new MailMessage(from, to);
-                        message.Subject = "BackUp chuvashia.com";
-                        message.Body = body;
-                        message.IsBodyHtml = true;
+                        var message = new MailMessage(from, to)
+                        {
+                            Subject = "BackUp chuvashia.com",
+                            Body = body,
+                            IsBodyHtml = true
+                        };
 
-                        var smtp = new SmtpClient(Params.EmailHost, Params.EmailPort);
-                        smtp.Credentials = new NetworkCredential(Params.EmailFromAddress, Params.EmailPassword);
-                        smtp.EnableSsl = Params.EmailEnableSsl;
-
+                        var smtp = new SmtpClient(Params.EmailHost, Params.EmailPort)
+                        {
+                            Credentials = new NetworkCredential(Params.EmailFromAddress, Params.EmailPassword),
+                            EnableSsl = Params.EmailEnableSsl
+                        };
                         smtp.Send(message);
                     }
                 }
@@ -149,11 +149,11 @@ namespace BackUp.Core
                     DownloadFileFTP(fold, fold + "_" + dateDir + ".bak", pathTo);
                     
                     messageBody += fold + "; ";
-                    ServiceLogger.Info("{work}", String.Format("скачивание backup-а {0} проведено", fold));
+                    ServiceLogger.Info("{work}", $"скачивание backup-а {fold} проведено");
                 }
                 catch (Exception e)
                 {
-                    ServiceLogger.Info("{error}", String.Format("при скачивании backup-а {0} произошла ошибка", fold));
+                    ServiceLogger.Info("{error}", $"при скачивании backup-а {fold} произошла ошибка");
                     ServiceLogger.Error("{error}", e.ToString());
                 }
             }
@@ -166,13 +166,12 @@ namespace BackUp.Core
         /// <returns></returns>
         private static void CreateDirectoryOnServer(string folderName)
         {
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://chuvashia.com/" + folderName);
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}/{folderName}");
             request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
             request.Method = WebRequestMethods.Ftp.MakeDirectory;
             using (var response = (FtpWebResponse)request.GetResponse())
             {
-                ServiceLogger.Info("{work}", String.Format("создана папка: {0} статус: {1}",
-                                                            folderName, response.StatusCode.ToString()));
+                ServiceLogger.Info("{work}", $"создана папка: {folderName} статус: {response.StatusCode.ToString()}");
             }
         }
 
@@ -182,7 +181,7 @@ namespace BackUp.Core
         /// <returns></returns>
         private static string[] GetDirectoryListFromServer()
         {
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://chuvashia.com/");
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}/");
             request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
             request.Method = WebRequestMethods.Ftp.ListDirectory;
 
@@ -202,7 +201,7 @@ namespace BackUp.Core
         /// </summary>
         private static void DownloadFileFTP(string folderName, string fileName, string pathTo)
         {
-            string ftpFullPath = "ftp://chuvashia.com/" + folderName + "/" + fileName;
+            string ftpFullPath = $"{Params.FtpServer}{folderName}/{fileName}";
             string downloadFilePath = Path.Combine(pathTo, fileName);
             
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpFullPath);

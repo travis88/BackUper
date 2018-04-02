@@ -1,14 +1,8 @@
 ﻿using BackUp.Core;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace BackUp.Svc
 {
@@ -29,6 +23,9 @@ namespace BackUp.Svc
         /// </summary>
         ConfigParams _params = new ConfigParams();
 
+        /// <summary>
+        /// Конструктор
+        /// </summary>
         public Service1()
         {
             InitializeComponent();
@@ -97,10 +94,10 @@ namespace BackUp.Svc
                         continue;
                     }
 
-                    ServiceLogger.Info("{thread}", String.Format("дата запуска: {0} число месяца", _params.Day));
-                    ServiceLogger.Info("{thread}", String.Format("время запуска: {0}", _params.StartTime));
-                    ServiceLogger.Info("{thread}", String.Format("до следующей запуска: {0} day(s) {1} hour(s) {2} minute(s) {3} second(s)",
-                                                                   awaitDate.Days, awaitDate.Hours, awaitDate.Minutes, awaitDate.Seconds));
+                    ServiceLogger.Info("{thread}", $"дата запуска: {_params.Day} число месяца");
+                    ServiceLogger.Info("{thread}", $"время запуска: {_params.StartTime}");
+                    ServiceLogger.Info("{thread}", $"до следующей запуска: " +
+                        $"{awaitDate.Days} day(s) {awaitDate.Hours} hour(s) {awaitDate.Minutes} minute(s) {awaitDate.Seconds} second(s)");
                     // подождём ещё
                     Thread.Sleep(awaitDate);
 

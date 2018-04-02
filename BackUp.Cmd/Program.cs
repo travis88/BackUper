@@ -1,9 +1,5 @@
 ﻿using BackUp.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BackUp.Cmd
 {
@@ -11,8 +7,12 @@ namespace BackUp.Cmd
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("creater backup's");
+            Console.WriteLine("press any button to run");
             ConfigParams _params = new ConfigParams();
             Launcher.Start(_params);
+            Console.WriteLine("backup's done");
+            Console.ReadLine();
         }
     }
 }
