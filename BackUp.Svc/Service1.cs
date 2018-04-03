@@ -59,57 +59,83 @@ namespace BackUp.Svc
         }
 
         /// <summary>
+        /// Время ожидание запуска интеграции
+        /// </summary>
+        /// <param name="runTime"></param>
+        /// <returns></returns>
+        private int MilisecondsToWait(TimeSpan runTime)
+        {
+            int result = 10000;
+            var _currentTime = DateTime.Now.TimeOfDay;
+
+            switch (TimeSpan.Compare(_currentTime, runTime))
+            {
+                case 1:
+                    result = (int)(86400000 - _currentTime.TotalMilliseconds + runTime.TotalMilliseconds);
+                    break;
+                case 0:
+                    result = 0;
+                    break;
+                case -1:
+                    result = (int)(runTime.TotalMilliseconds - _currentTime.TotalMilliseconds);
+                    break;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Время ожидания запуска интеграции
+        /// </summary>
+        /// <param name="runTime"></param>
+        /// <returns></returns>
+        private int MilisecondsToWait(string runTime)
+        {
+            if (TimeSpan.TryParse(runTime, out TimeSpan _runTime))
+            {
+                return MilisecondsToWait(_runTime);
+            }
+            string errorMessage = "ошибка определения времени выполнения";
+            ServiceLogger.Error("{error}", errorMessage);
+            throw new Exception(errorMessage);
+        }
+
+        /// <summary>
         /// Создание backup-ов
         /// </summary>
         private void DoBackups()
         {
             while (enableService)
             {
-                // текущее время
                 DateTime now = DateTime.Now;
-                // разница во времени
-                DateTime deltaTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
 
-                string[] timeArray = _params.StartTime.Split(':');
+                ServiceLogger.Info("{thread}", $"дата запуска: {_params.Day} число месяца");
+                ServiceLogger.Info("{thread}", $"время запуска: {_params.StartTime}");
 
-                if (now.Day != _params.Day || !_params.Months.Contains(now.Month))
+                if (now.Day != _params.Day)
                 {
-                    // засыпаем на сутки, если день не тот
-                    Thread.Sleep(deltaTime.AddDays(1) - deltaTime);
+                    DateTime deltaTime = new DateTime(now.AddDays(1).Year, 
+                        now.AddDays(1).Month, now.AddDays(1).Day, 0, 0, 0);
+                    Thread.Sleep(deltaTime.Subtract(now));
+                    continue;
                 }
-                else
+
+                int executeWait = MilisecondsToWait(_params.StartTime);
+                int hoursWait = executeWait / 1000 / 60 / 60;
+                int minutesWait = (executeWait - (hoursWait * 60 * 60 * 1000)) / 1000 / 60;
+                int secWait = (executeWait - (hoursWait * 60 * 60 * 1000) - (minutesWait * 60 * 1000)) / 1000;
+                ServiceLogger.Info("{thread}", $"импорт будет выполнен через: " +
+                                $"{hoursWait} час. {minutesWait} мин. {secWait} сек.");
+
+                Thread.Sleep(executeWait);
+
+                try
                 {
-                    int hour = Int32.Parse(timeArray[0]);
-                    int minutes = Int32.Parse(timeArray[1]);
-
-                    // дата следующего backup-а
-                    DateTime nextSending = new DateTime(now.Year, now.Month, _params.Day, hour, minutes, 0);
-
-                    // время ожидания
-                    var awaitDate = nextSending.Subtract(now);
-
-                    if (awaitDate.TotalMilliseconds < 0)
-                    {
-                        Thread.Sleep(3600000);
-                        continue;
-                    }
-
-                    ServiceLogger.Info("{thread}", $"дата запуска: {_params.Day} число месяца");
-                    ServiceLogger.Info("{thread}", $"время запуска: {_params.StartTime}");
-                    ServiceLogger.Info("{thread}", $"до следующей запуска: " +
-                        $"{awaitDate.Days} day(s) {awaitDate.Hours} hour(s) {awaitDate.Minutes} minute(s) {awaitDate.Seconds} second(s)");
-                    // подождём ещё
-                    Thread.Sleep(awaitDate);
-
-                    try
-                    {
-                        Launcher.Start(_params);
-                    }
-                    catch (Exception e)
-                    {
-                        ServiceLogger.Info("{error}", "произошла ошибка");
-                        ServiceLogger.Error("{error}", e.ToString());
-                    }
+                    ServiceLogger.Info("{thread}", "здесь будет создание backup-ов");
+                    //Launcher.Start(_params);
+                }
+                catch (Exception e)
+                {
+                    ServiceLogger.Error("{error}", e.ToString());
                 }
             }
         }

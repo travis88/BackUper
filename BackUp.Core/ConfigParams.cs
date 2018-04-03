@@ -100,16 +100,19 @@ namespace BackUp.Core
         {
             StartTime = System.Configuration.ConfigurationManager.AppSettings["Backup.StartTime"];
             Day = Int32.Parse(System.Configuration.ConfigurationManager.AppSettings["Backup.Day"]);
-            Months = System.Configuration.ConfigurationManager.AppSettings["Backup.Months"].Split(';').Where(w => !String.IsNullOrEmpty(w)).Select(s => Int32.Parse(s)).ToArray();
+            Months = System.Configuration.ConfigurationManager.AppSettings["Backup.Months"]
+                .Split(';').Where(w => !String.IsNullOrEmpty(w)).Select(s => Int32.Parse(s)).ToArray();
             PathFrom = System.Configuration.ConfigurationManager.AppSettings["Backup.PathFrom"];
             PathTo = System.Configuration.ConfigurationManager.AppSettings["Backup.PathTo"];
             FtpServer = System.Configuration.ConfigurationManager.AppSettings["Backup.FtpServer"];
             FtpUserName = System.Configuration.ConfigurationManager.AppSettings["Backup.Username"];
             FtpUserPassword = System.Configuration.ConfigurationManager.AppSettings["Backup.UserPassword"];
-            StrFolders = System.Configuration.ConfigurationManager.AppSettings["Backup.Folders"].Replace("\n", "").Replace("\r", "").Replace(" ", "");
+            StrFolders = System.Configuration.ConfigurationManager.AppSettings["Backup.Folders"]
+                .Replace("\n", "").Replace("\r", "").Replace(" ", "");
             Folders = StrFolders.Split(';').Where(w => !String.IsNullOrEmpty(w)).Select(s => s).ToArray();
             EmailFromAddress = System.Configuration.ConfigurationManager.AppSettings["Email.From.Address"];
-            EmailToAddresses = System.Configuration.ConfigurationManager.AppSettings["Email.To.Address"].Split(';');
+            EmailToAddresses = System.Configuration.ConfigurationManager.AppSettings["Email.To.Address"]
+                .Split(';').Where(w => !String.IsNullOrEmpty(w)).ToArray();
             EmailFromName = System.Configuration.ConfigurationManager.AppSettings["Email.From.Name"];
             EmailPassword = System.Configuration.ConfigurationManager.AppSettings["Email.Password"];
             EmailHost = System.Configuration.ConfigurationManager.AppSettings["Email.Host"];
