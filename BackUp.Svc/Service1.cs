@@ -107,10 +107,7 @@ namespace BackUp.Svc
             while (enableService)
             {
                 DateTime now = DateTime.Now;
-
-                ServiceLogger.Info("{thread}", $"дата запуска: {_params.Day} число месяца");
-                ServiceLogger.Info("{thread}", $"время запуска: {_params.StartTime}");
-
+                
                 if (now.Day != _params.Day)
                 {
                     DateTime deltaTime = new DateTime(now.AddDays(1).Year, 
@@ -123,6 +120,8 @@ namespace BackUp.Svc
                 int hoursWait = executeWait / 1000 / 60 / 60;
                 int minutesWait = (executeWait - (hoursWait * 60 * 60 * 1000)) / 1000 / 60;
                 int secWait = (executeWait - (hoursWait * 60 * 60 * 1000) - (minutesWait * 60 * 1000)) / 1000;
+                ServiceLogger.Info("{thread}", $"дата запуска: {_params.Day} число месяца");
+                ServiceLogger.Info("{thread}", $"время запуска: {_params.StartTime}");
                 ServiceLogger.Info("{thread}", $"импорт будет выполнен через: " +
                                 $"{hoursWait} час. {minutesWait} мин. {secWait} сек.");
 
@@ -130,8 +129,7 @@ namespace BackUp.Svc
 
                 try
                 {
-                    ServiceLogger.Info("{thread}", "здесь будет создание backup-ов");
-                    //Launcher.Start(_params);
+                    Launcher.Start(_params);
                 }
                 catch (Exception e)
                 {
