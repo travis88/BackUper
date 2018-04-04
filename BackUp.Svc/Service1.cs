@@ -1,6 +1,5 @@
 ﻿using BackUp.Core;
 using System;
-using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
 
@@ -104,6 +103,7 @@ namespace BackUp.Svc
         /// </summary>
         private void DoBackups()
         {
+            ServiceLogger.Info("{thread}", "поехали");
             while (enableService)
             {
                 DateTime now = DateTime.Now;
