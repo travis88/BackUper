@@ -58,7 +58,7 @@ namespace BackUp.Core
                 string[] listOfDirectories = GetDirectoryListFromServer();
                 foreach (string folder in Params.Folders)
                 {
-                    bool isExists = listOfDirectories.Contains(folder);
+                    bool isExists = listOfDirectories.Contains(folder.ToLower());
                     if (!isExists)
                     {
                         CreateDirectoryOnServer(folder);
@@ -95,7 +95,7 @@ namespace BackUp.Core
         {
             try
             {
-                ServiceLogger.Info("{work}", "рассылка оповещения");
+                ServiceLogger.Info("{work}", "рассылка оповещений");
                 foreach (var emailTo in Params.EmailToAddresses)
                 {
                     if (!String.IsNullOrEmpty(emailTo))
@@ -166,7 +166,7 @@ namespace BackUp.Core
         /// <returns></returns>
         private static void CreateDirectoryOnServer(string folderName)
         {
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}/{folderName}");
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}{folderName}");
             request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
             request.Method = WebRequestMethods.Ftp.MakeDirectory;
             using (var response = (FtpWebResponse)request.GetResponse())
@@ -181,7 +181,7 @@ namespace BackUp.Core
         /// <returns></returns>
         private static string[] GetDirectoryListFromServer()
         {
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}/");
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}");
             request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
             request.Method = WebRequestMethods.Ftp.ListDirectory;
 
@@ -189,7 +189,7 @@ namespace BackUp.Core
             {
                 using (StreamReader directoryListResponseReader = new StreamReader(directoryListResponse.GetResponseStream()))
                 {
-                    string responseString = directoryListResponseReader.ReadToEnd();
+                    string responseString = directoryListResponseReader.ReadToEnd().ToLower();
                     string[] results = responseString.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     return results;
                 }

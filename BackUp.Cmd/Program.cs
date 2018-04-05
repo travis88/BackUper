@@ -10,27 +10,7 @@ namespace BackUp.Cmd
             Console.WriteLine("creater backup's");
             Console.WriteLine("press any button to run");
             ConfigParams _params = new ConfigParams();
-
-            DateTime now = DateTime.Now;
-            DateTime d = now.AddDays(1);
-            DateTime deltaTime = new DateTime(d.Year, d.Month, d.Day, 0, 0, 0);
-            TimeSpan awaitTime = deltaTime.Subtract(now);
-            ServiceLogger.Info("{thread}", $"дата запуска: {_params.Day} число месяца");
-            ServiceLogger.Info("{thread}", $"время запуска: {_params.StartTime}");
-
-            if (now.Day != _params.Day)
-            {
-                //Thread.Sleep(awaitTime);
-            }
-
-            int executeWait = MilisecondsToWait(_params.StartTime);
-            int hoursWait = executeWait / 1000 / 60 / 60;
-            int minutesWait = (executeWait - (hoursWait * 60 * 60 * 1000)) / 1000 / 60;
-            int secWait = (executeWait - (hoursWait * 60 * 60 * 1000) - (minutesWait * 60 * 1000)) / 1000;
-            ServiceLogger.Info("{thread}", $"импорт будет выполнен через: " +
-                            $"{hoursWait} час. {minutesWait} мин. {secWait} сек.");
-            //Thread.Sleep(executeWait);
-            //Launcher.Start(_params);
+            Launcher.Start(_params);
             Console.WriteLine("backup's done");
             Console.ReadLine();
         }
