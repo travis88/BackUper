@@ -198,8 +198,7 @@ namespace BackUp.Core
                     using (StreamReader directoryListResponseReader = new StreamReader(directoryListResponse.GetResponseStream()))
                     {
                         string responseString = directoryListResponseReader.ReadToEnd().ToLower();
-                        string[] results = responseString.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                        return results;
+                        return responseString.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     }
                 }
             }
