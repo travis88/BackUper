@@ -56,26 +56,29 @@ namespace BackUp.Core
             try
             {
                 string[] listOfDirectories = GetDirectoryListFromServer();
-                foreach (string folder in Params.Folders)
+                if (listOfDirectories != null)
                 {
-                    bool isExists = listOfDirectories.Contains(folder.ToLower());
-                    if (!isExists)
+                    foreach (string folder in Params.Folders)
                     {
-                        CreateDirectoryOnServer(folder);
+                        bool isExists = listOfDirectories.Contains(folder.ToLower());
+                        if (!isExists)
+                        {
+                            CreateDirectoryOnServer(folder);
+                        }
                     }
-                }
 
-                ServiceLogger.Info("{work}", "запуск скрипта по созданию backup");
-                using (var db = new DbModel(connection))
-                {
-                    if (db.Command != null)
+                    ServiceLogger.Info("{work}", "запуск скрипта по созданию backup");
+                    using (var db = new DbModel(connection))
                     {
-                        db.Command.CommandTimeout = 1800000;
-                        db.backup_service(Params.StrFolders);
-                        result = true;
+                        if (db.Command != null)
+                        {
+                            db.Command.CommandTimeout = 1800000;
+                            db.backup_service(Params.StrFolders);
+                            result = true;
+                        }
                     }
+                    ServiceLogger.Info("{work}", "создание backup завершено");
                 }
-                ServiceLogger.Info("{work}", "создание backup завершено");
             }
             catch (Exception e)
             {
@@ -132,7 +135,7 @@ namespace BackUp.Core
         /// </summary>
         private static void CopyBackups()
         {
-            messageBody += "<p>Список скопированных backup-ов:</p><p>";
+            messageBody += "<ol>Список скопированных backup-ов:</ol>";
             string dateDir = DateTime.Now.ToString("yyyyMMdd");
 
             foreach (string fold in Params.Folders)
@@ -147,9 +150,6 @@ namespace BackUp.Core
                     }
 
                     DownloadFileFTP(fold, fold + "_" + dateDir + ".bak", pathTo);
-                    
-                    messageBody += fold + "; ";
-                    ServiceLogger.Info("{work}", $"скачивание backup-а {fold} проведено");
                 }
                 catch (Exception e)
                 {
@@ -157,7 +157,6 @@ namespace BackUp.Core
                     ServiceLogger.Error("{error}", e.ToString());
                 }
             }
-            messageBody += "</p>";
         }
 
         /// <summary>
@@ -166,12 +165,19 @@ namespace BackUp.Core
         /// <returns></returns>
         private static void CreateDirectoryOnServer(string folderName)
         {
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}{folderName}");
-            request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
-            request.Method = WebRequestMethods.Ftp.MakeDirectory;
-            using (var response = (FtpWebResponse)request.GetResponse())
+            try
             {
-                ServiceLogger.Info("{work}", $"создана папка: {folderName} статус: {response.StatusCode.ToString()}");
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}{folderName}");
+                request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
+                request.Method = WebRequestMethods.Ftp.MakeDirectory;
+                using (var response = (FtpWebResponse)request.GetResponse())
+                {
+                    ServiceLogger.Info("{work}", $"создана папка: {folderName} статус: {response.StatusCode.ToString()}");
+                }
+            }
+            catch (Exception e)
+            {
+                ServiceLogger.Error("{error}", e.ToString());
             }
         }
 
@@ -181,18 +187,26 @@ namespace BackUp.Core
         /// <returns></returns>
         private static string[] GetDirectoryListFromServer()
         {
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}");
-            request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
-            request.Method = WebRequestMethods.Ftp.ListDirectory;
-
-            using (FtpWebResponse directoryListResponse = (FtpWebResponse)request.GetResponse())
+            try
             {
-                using (StreamReader directoryListResponseReader = new StreamReader(directoryListResponse.GetResponseStream()))
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"{Params.FtpServer}");
+                request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
+                request.Method = WebRequestMethods.Ftp.ListDirectory;
+
+                using (FtpWebResponse directoryListResponse = (FtpWebResponse)request.GetResponse())
                 {
-                    string responseString = directoryListResponseReader.ReadToEnd().ToLower();
-                    string[] results = responseString.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                    return results;
+                    using (StreamReader directoryListResponseReader = new StreamReader(directoryListResponse.GetResponseStream()))
+                    {
+                        string responseString = directoryListResponseReader.ReadToEnd().ToLower();
+                        string[] results = responseString.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                        return results;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                ServiceLogger.Error("{error}", e.ToString());
+                return null;
             }
         }
 
@@ -201,17 +215,27 @@ namespace BackUp.Core
         /// </summary>
         private static void DownloadFileFTP(string folderName, string fileName, string pathTo)
         {
-            string ftpFullPath = $"{Params.FtpServer}{folderName}/{fileName}";
-            string downloadFilePath = Path.Combine(pathTo, fileName);
-            
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpFullPath);
-            request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
-            request.Method = WebRequestMethods.Ftp.DownloadFile;
-
-            using (Stream ftpStream = request.GetResponse().GetResponseStream())
-            using (Stream fileStream = File.Create(downloadFilePath))
+            try
             {
-                ftpStream.CopyTo(fileStream);
+                string ftpFullPath = $"{Params.FtpServer}{folderName}/{fileName}";
+                string downloadFilePath = Path.Combine(pathTo, fileName);
+            
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpFullPath);
+                request.Credentials = new NetworkCredential(Params.FtpUserName, Params.FtpUserPassword);
+                request.Method = WebRequestMethods.Ftp.DownloadFile;
+
+                using (Stream ftpStream = request.GetResponse().GetResponseStream())
+                using (Stream fileStream = File.Create(downloadFilePath))
+                {
+                    ftpStream.CopyTo(fileStream);
+                }
+
+                messageBody += $"<li>{folderName}</li>";
+                ServiceLogger.Info("{work}", $"скачивание backup-а {folderName} проведено");
+            }
+            catch (Exception e)
+            {
+                ServiceLogger.Error("{error}", e.ToString());
             }
         }
     }
