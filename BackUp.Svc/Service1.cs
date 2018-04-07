@@ -135,6 +135,8 @@ namespace BackUp.Svc
                 {
                     ServiceLogger.Error("{error}", e.ToString());
                 }
+                // спать день
+                Thread.Sleep(86400000);
             }
         }
     }
