@@ -144,14 +144,7 @@ namespace BackUp.Svc
         /// Проверяет является ли сегодняшний день первой субботой месяца
         /// </summary>
         /// <returns></returns>
-        private bool CheckFirstSaturdayOfMonth(DateTime now)
-        {
-            if (now.DayOfWeek == DayOfWeek.Saturday
-                && now.AddDays(-7).Month != now.Month)
-            {
-                return true;
-            }
-            return false;
-        }
+        private bool CheckFirstSaturdayOfMonth(DateTime now) =>
+            now.DayOfWeek == DayOfWeek.Saturday && now.AddDays(-7).Month != now.Month;
     }
 }

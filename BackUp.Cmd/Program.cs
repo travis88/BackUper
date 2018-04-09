@@ -15,7 +15,7 @@ namespace BackUp.Cmd
             int month = now.Month;
             int day = now.Day;
             string today = $"Today is day: {day}; month: {month}; dayOfWeek: {dayOfWeek}";
-            if (now.DayOfWeek.ToString().ToLower() == "saturday"
+            if (now.DayOfWeek == DayOfWeek.Saturday
                 && now.AddDays(-7).Month != now.Month)
             {
                 Console.WriteLine(today);
