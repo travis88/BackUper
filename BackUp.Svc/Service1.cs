@@ -146,7 +146,7 @@ namespace BackUp.Svc
         /// <returns></returns>
         private bool CheckFirstSaturdayOfMonth(DateTime now)
         {
-            if (now.DayOfWeek.ToString().ToLower() == "saturday" 
+            if (now.DayOfWeek == DayOfWeek.Saturday
                 && now.AddDays(-7).Month != now.Month)
             {
                 return true;
