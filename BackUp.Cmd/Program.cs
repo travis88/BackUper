@@ -9,8 +9,21 @@ namespace BackUp.Cmd
         {
             Console.WriteLine("creater backup's");
             Console.WriteLine("press any button to run");
-            ConfigParams _params = new ConfigParams();
-            Launcher.Start(_params);
+
+            DateTime now = new DateTime(2018, 4, 14);
+            string dayOfWeek = now.DayOfWeek.ToString().ToLower();
+            int month = now.Month;
+            int day = now.Day;
+            string today = $"Today is day: {day}; month: {month}; dayOfWeek: {dayOfWeek}";
+            if (now.DayOfWeek.ToString().ToLower() == "saturday"
+                && now.AddDays(-7).Month != now.Month)
+            {
+                Console.WriteLine(today);
+            }
+            
+
+            //ConfigParams _params = new ConfigParams();
+            //Launcher.Start(_params);
             Console.WriteLine("backup's done");
             Console.ReadLine();
         }

@@ -108,7 +108,7 @@ namespace BackUp.Svc
             {
                 DateTime now = DateTime.Now;
                 
-                if (now.Day != _params.Day)
+                if (!CheckFirstSaturdayOfMonth(now))
                 {
                     DateTime deltaTime = new DateTime(now.AddDays(1).Year, 
                         now.AddDays(1).Month, now.AddDays(1).Day, 0, 0, 0);
@@ -120,7 +120,7 @@ namespace BackUp.Svc
                 int hoursWait = executeWait / 1000 / 60 / 60;
                 int minutesWait = (executeWait - (hoursWait * 60 * 60 * 1000)) / 1000 / 60;
                 int secWait = (executeWait - (hoursWait * 60 * 60 * 1000) - (minutesWait * 60 * 1000)) / 1000;
-                ServiceLogger.Info("{thread}", $"дата запуска: {_params.Day} число месяца");
+                ServiceLogger.Info("{thread}", $"дата запуска: первая суббота месяца");
                 ServiceLogger.Info("{thread}", $"время запуска: {_params.StartTime}");
                 ServiceLogger.Info("{thread}", $"импорт будет выполнен через: " +
                                 $"{hoursWait} час. {minutesWait} мин. {secWait} сек.");
@@ -138,6 +138,20 @@ namespace BackUp.Svc
                 // спать день
                 Thread.Sleep(86400000);
             }
+        }
+
+        /// <summary>
+        /// Проверяет является ли сегодняшний день первой субботой месяца
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckFirstSaturdayOfMonth(DateTime now)
+        {
+            if (now.DayOfWeek.ToString().ToLower() == "saturday" 
+                && now.AddDays(-7).Month != now.Month)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
